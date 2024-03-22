@@ -1,5 +1,7 @@
 # ids721-mini7
 
+![pipeline status](https://gitlab.com/dukeaiml/IDS721/yx248-mini7/badges/main/pipeline.svg)
+
 ## Create a Cargo Function Microservice Project
 
 1. Install Rust and Cargo

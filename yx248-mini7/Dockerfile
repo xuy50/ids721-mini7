@@ -6,7 +6,7 @@ RUN cargo build --release
 
 # Distroless runtime stage
 FROM gcr.io/distroless/cc-debian11
-COPY --from=build /app/target/release/yx248-mini4 /app/
+COPY --from=build /app/target/release/yx248-mini7 /app/
 
 # Use non-root user
 USER nonroot:nonroot
@@ -19,4 +19,4 @@ WORKDIR $APP_HOME
 EXPOSE 3000
 
 # Run app
-ENTRYPOINT ["/app/yx248-mini4"]
+ENTRYPOINT ["/app/yx248-mini7"]

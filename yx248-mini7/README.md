@@ -1,4 +1,4 @@
-# ids721-mini4
+# ids721-mini7
 
 ## Create a Cargo Function Microservice Project
 
@@ -22,7 +22,7 @@ source $HOME/.cargo/env
 To create a new Cargo project, use the cargo new command. For a microservice, you might want to start with a simple binary project:
 
 ```bash
-cargo new yx248-mini4 --bin
+cargo new yx248-mini7 --bin
 ```
 
 This command creates a new directory named my_microservice with the basic structure of a Rust project.
@@ -34,15 +34,15 @@ Edit the `Cargo.toml` file to add necessary dependencies. For a microservice, yo
 axum = "0.7.4"
 tokio = { version = "1.36.0", features = ["macros", "full"] }
 tower = "0.4.13"
-# s3
-rusoto_core = "0.47.0"
-rusoto_s3 = "0.47.0"
 csv = "1.1"
 # json
 serde_json = "1.0.113"
 serde = { version = "1.0.196", features = ["derive"] }
 # openssl
 openssl = { version = "0.10", features = ["vendored"] }
+# qdrant
+reqwest = { version = "0.11", features = ["json"] }
+uuid = { version = "1", features = ["serde", "v4"] }
 ```
 
 Always check for the latest version of these libraries.
@@ -83,10 +83,10 @@ curl http://127.0.0.1:8080/
 
 ```bash
 # Build the Docker image
-sudo docker build -t yx248-mini4-image .
+sudo docker build -t yx248-mini7-image .
 
 # Run the container in detached mode (background) mapping port 3000
-sudo docker run -dp 3000:3000 yx248-mini4-image
+sudo docker run -dp 3000:3000 yx248-mini7-image
 
 # List running containers to find the container ID
 sudo docker ps
@@ -120,5 +120,99 @@ sudo docker-compose down
 ![Docker Build](images/docker-compose_build.png)
 ![Docker Up Ps Down](images/docker-compose_up_ps_down.png)
 
-- Here is the screenshot for my result I got when I run my microservice:
-![Docker Container Server Work Result](images/result_sample.png)
+## Vector Database
+
+
+## Vector Database Integration with Qdrant
+
+This microservice leverages the Qdrant vector database for storing and querying vectorized data. Below are examples of how the microservice interacts with Qdrant, including creating collections, deleting collections, adding points to a collection, searching for points, and scrolling through points based on specific filters.
+
+### Creating a Collection
+
+To store vectors, a collection with a defined vector size and distance metric is required. Here's how a collection is created:
+
+```json
+PUT collections/my_collection
+{
+  "vectors": {
+    "size": 2,
+    "distance": "Cosine"
+  }
+}
+```
+
+### Deleting a Collection
+
+To remove an existing collection and all its data:
+
+```json
+DELETE collections/my_collection
+```
+
+### Adding Points to a Collection
+
+Points, along with their payload, can be added to a collection as follows:
+
+```json
+PUT collections/my_collection/points
+{
+  "points": [
+    {
+      "id": 1,
+      "vector": [1.2, 50],
+      "payload": {
+        "date": "2023-09-01",
+        "product": "Apple",
+        "price": 1.2,
+        "quantity": 50
+      }
+    }
+  ]
+}
+```
+
+### Searching for Points
+
+To search for points in a collection based on their vector:
+
+```json
+POST collections/my_collection/points/search
+{
+  "vector": [1.2, 50],
+  "limit": 3,
+  "with_payload": true
+}
+```
+
+### Scrolling Through Points with Filters
+
+To scroll through points in a collection based on a range filter:
+
+```json
+POST collections/my_collection/points/scroll
+{
+  "filter": {
+    "should": [
+      {
+        "key": "price",
+        "range": {
+          "gte": 1,
+          "lte": 2
+        }
+      }
+    ]
+  }
+}
+```
+
+### Screenshots
+
+Below are screenshots showcasing the results obtained when running various operations of the microservice:
+
+- Adding data via terminal and web interface:
+![add_data_terminal_output](images/add_data_terminal_output.png)
+![add_data_webpage_output](images/add_data_webpage_output.png)
+
+- Filtering data via terminal and web interface:
+![filter_terminal_output](images/filter_terminal_output.png)
+![filter_webpage_output](images/filter_webpage_output.png)

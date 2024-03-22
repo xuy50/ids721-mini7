@@ -1,8 +1,8 @@
 version: '3.3'
 services:
-  yx248-mini4:
+  yx248-mini7:
     build: .
-    image: yx248-mini4-image
+    image: yx248-mini7-image
     ports:
       - "3000:3000"
     environment:
